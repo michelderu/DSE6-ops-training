@@ -132,9 +132,9 @@ Run cleanup **before** taking a snapshot when you’ve done topology changes (se
 ## Compaction
 
 - **Compaction** merges SSTables and reclaims space; it’s automatic. You can tune throughput and see status.
-- Check: `nodetool compactionstats`
-- Set throughput (MB/s): `nodetool setcompactionthroughput 32`
-- Force user compaction (use with care): `nodetool compact training sample`
+- Check: `./scripts/nodetool.sh compactionstats`
+- Set throughput (MB/s): `./scripts/nodetool.sh setcompactionthroughput 32`
+- Force user compaction (use with care): `./scripts/nodetool.sh compact training sample`
 
 ## 🧪 Hands-On Exercises
 
@@ -142,7 +142,7 @@ Run cleanup **before** taking a snapshot when you’ve done topology changes (se
 
 1. Run primary-only repair on the seed:  
    `./scripts/nodetool.sh repair -pr`
-2. Watch `nodetool netstats` while repair runs to see streaming activity.
+2. Watch `./scripts/nodetool.sh netstats` while repair runs to see streaming activity.
 3. Verify repair completed successfully by checking logs: `./scripts/logs.sh dse-seed --tail 20`
 
 ### 🟡 Intermediate: Repair with Monitoring

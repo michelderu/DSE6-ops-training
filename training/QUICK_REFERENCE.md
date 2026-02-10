@@ -72,13 +72,13 @@ docker-compose restart dse-node-1
 ./scripts/nodetool.sh gossipinfo
 ```
 
-### Logs
+### Logs (system.log in container)
 
 ```bash
-# Follow all logs
+# Follow system.log on seed (default)
 ./scripts/logs.sh
 
-# Follow specific node logs
+# Follow system.log for a specific node
 ./scripts/logs.sh dse-seed
 ./scripts/logs.sh dse-node-1
 

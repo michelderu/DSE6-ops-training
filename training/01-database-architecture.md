@@ -2,6 +2,8 @@
 
 Understanding how Cassandra works internally helps you operate, troubleshoot, and tune the cluster effectively. This module covers the core mechanisms that make Cassandra a distributed, highly available database.
 
+📌 **No cluster required:** This module is concepts only. You will run the related commands (e.g. `nodetool gossipinfo`, `nodetool compactionstats`) in later modules once the cluster is up ([03 – Environment](03-environment.md) and [05 – Monitoring](05-monitoring.md)).
+
 📚 **Reference**: This module is based on the [DSE 6.8 Database Architecture documentation](https://docs.datastax.com/en/dse/6.8/architecture/database-architecture/database-architecture-contents.html) and [DSE 6.9 Database Architecture documentation](https://docs.datastax.com/en/dse/6.9/architecture/database-architecture/database-architecture-contents.html).
 
 ## 🎯 Goals
@@ -27,11 +29,7 @@ Cassandra uses a **gossip protocol** for peer-to-peer communication. Each node p
 - ⚡ Fast failure detection: nodes learn about failures within seconds
 - 🔄 Automatic topology discovery: new nodes learn the cluster layout from seeds
 
-💡 **In your lab**: When `dse-node-1` starts, it contacts `dse-seed` (via `SEEDS=dse-seed`), learns about the cluster through gossip, and joins the ring. You can see gossip information with:
-
-```bash
-./scripts/nodetool.sh gossipinfo
-```
+💡 **In the lab (once the cluster is up)**: When `dse-node-1` starts, it contacts `dse-seed` (via `SEEDS=dse-seed`), learns about the cluster through gossip, and joins the ring. You will inspect gossip in [05 – Monitoring](05-monitoring.md) with `nodetool gossipinfo` after the cluster is running.
 
 ## 📊 Data Distribution: Consistent Hashing
 
@@ -94,11 +92,7 @@ When you read data, Cassandra follows this path:
 - **LeveledCompactionStrategy (LCS)**: Organizes SSTables into levels (L0, L1, L2...). More predictable space usage, better for read-heavy workloads.
 - **TimeWindowCompactionStrategy (TWCS)**: Groups SSTables by time windows. Ideal for time-series data with TTLs.
 
-💡 **In your lab**: Check compaction stats with:
-
-```bash
-./scripts/nodetool.sh compactionstats
-```
+💡 **In the lab (once the cluster is up)**: You will check compaction in [05 – Monitoring](05-monitoring.md) with `nodetool compactionstats` and in [07 – Repair & Maintenance](07-repair-maintenance.md).
 
 ## 🔄 Data Consistency: Repair Mechanisms
 
@@ -130,7 +124,7 @@ When reading with a consistency level that contacts multiple replicas:
 
 ⚠️ **Why it's needed**: Hints expire, nodes can be down longer than the hint window, or corruption can occur. Anti-entropy repair is the definitive way to ensure consistency.
 
-💡 **In your lab**: See [07 – Repair & Maintenance](07-repair-maintenance.md) for how to run repair.
+💡 **In the lab (once the cluster is up)**: You will run and monitor repair in [07 – Repair & Maintenance](07-repair-maintenance.md).
 
 ## ⚰️ Tombstones: How Deletes Work
 

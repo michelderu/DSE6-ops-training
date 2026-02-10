@@ -45,7 +45,9 @@ docker-compose down
 # Or: docker compose down
 ```
 
-💾 **Data preservation**: Data in `./data/` (seed, node1, node2) is preserved. To wipe data, remove the `data/` directory after stopping the cluster.
+💾 **Data preservation**: Database data is stored in Docker volumes defined in the `docker-compose.yml` file. Stopping the cluster (`docker-compose down`) preserves volumes by default, so your data remains safe across restarts.
+
+🗑️ **To fully remove data**: Run `docker-compose down -v` to remove the associated Docker volumes and wipe all persistent data. Alternatively, you can remove specific volumes using `docker volume rm <volume_name>`, as listed by `docker volume ls`.
 
 **Stop only DSE nodes** (e.g. keep other containers if you had any):
 
@@ -135,7 +137,7 @@ docker-compose restart dse-node-1
 # Or: docker compose restart dse-node-1
 ```
 
-💡 After a restart, run `nodetool status` until the node is UN again.
+💡 After a restart, run `./scripts/nodetool.sh status` until the node is UN again.
 
 ## 📝 Summary
 

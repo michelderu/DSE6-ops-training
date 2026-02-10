@@ -2,6 +2,8 @@
 
 Understand how DataStax Enterprise 6.8 and 6.9 are structured so you can operate and troubleshoot them effectively.
 
+📌 **No cluster required:** This module is concepts and topology only. You will run cqlsh and try replication/consistency commands in [03 – Environment](03-environment.md) after the cluster is up.
+
 ## Goals
 
 - Describe cluster, datacenter, rack, and node roles
@@ -18,6 +20,18 @@ Understand how DataStax Enterprise 6.8 and 6.9 are structured so you can operate
 - **Node**: A single DSE process (one machine or container). Each node holds a portion of the ring and replicas.
 
 In Docker Compose we have **3 nodes** in **1 DC**, all in the same logical “rack” for simplicity.
+
+### DSE topology vs cloud terms
+
+When you run DSE in the cloud, the same hierarchy maps to familiar cloud concepts:
+
+| DSE term | Meaning | Cloud equivalent (typical mapping) |
+|----------|---------|------------------------------------|
+| **Datacenter (DC)** | A group of nodes used for replication and workload; often a physical or logical site. | **Region** (e.g. AWS `us-east-1`, Azure `East US`, GCP `us-east1`) when one DC per region; or a **region** with one DC spanning multiple AZs. |
+| **Rack** | A failure domain inside a DC (e.g. one cabinet). The snitch uses it to spread replicas. | **Availability Zone (AZ)** (e.g. AWS `us-east-1a`, Azure Zone 1, GCP `us-east1-b`) or **Fault Domain** — one rack per AZ is common. |
+| **Node** | One DSE process (one machine). Each node owns part of the ring and replicas. | **Instance** / **VM** (e.g. AWS EC2 instance, Azure VM, GCP Compute Engine instance) or a **pod** when running on Kubernetes. |
+
+💡 **Rule of thumb:** One **node** per **instance/VM**; put nodes in different **racks** (AZs) so one AZ failure doesn't take multiple replicas; use one **DC** per **region** (or per failure boundary) for multi-region setups.
 
 ### Seed Nodes
 
@@ -48,9 +62,7 @@ In our 3-node cluster, `training` with `'DC1': 3` means every partition has one 
 
 In `./training/labs/sample-keyspace.cql`, replication is set when the keyspace is created: `CREATE KEYSPACE training WITH replication = { 'class': 'NetworkTopologyStrategy', 'DC1': 3 };`. That’s the `'DC1': 3` (RF=3 in DC1) and the strategy (NetworkTopologyStrategy).
 
-**How to see it at runtime:**
-
-From the repo root, run `./scripts/cqlsh.sh -e "DESCRIBE KEYSPACE training;"` (or open cqlsh with `./scripts/cqlsh.sh` and run `DESCRIBE KEYSPACE training;`). The output shows the keyspace definition, including the replication map.
+Once the cluster is up (Module 03), you will run `DESCRIBE KEYSPACE training;` in cqlsh to see this definition; the keyspace is created in that module from `training/labs/sample-keyspace.cql`.
 
 ## ⚖️ Consistency Levels
 
@@ -64,25 +76,7 @@ From the repo root, run `./scripts/cqlsh.sh -e "DESCRIBE KEYSPACE training;"` (o
 
 💡 **For a single-DC cluster with RF=3**: **QUORUM** (2 replicas) is a common choice for both reads and writes.
 
-📝 **Examples (in cqlsh)**: Set the default CL for the session with `CONSISTENCY <level>;`, or use it per statement. From the repo root, run `./scripts/cqlsh.sh`, then:
-
-```cql
--- Use QUORUM for this session (default for many apps)
-CONSISTENCY QUORUM;
-
--- Read with ONE (fast, may return stale data)
-CONSISTENCY ONE;
-SELECT * FROM training.sample LIMIT 1;
-
--- Write with QUORUM (durable, 2 of 3 replicas must ack)
-CONSISTENCY QUORUM;
-INSERT INTO training.sample (id, name, value, created_at) VALUES (uuid(), 'test', 42, toTimestamp(now()));
-
--- Per-statement CL (DSE/Cassandra 2.1+): USING CONSISTENCY
-SELECT * FROM training.sample LIMIT 1 USING CONSISTENCY ONE;
-```
-
-💡 Check the current session CL with `CONSISTENCY;` (no argument).
+📝 **Trying it in the lab:** In cqlsh, consistency is set per session with `CONSISTENCY <level>;` (e.g. `CONSISTENCY ONE` or `CONSISTENCY QUORUM`); that level then applies to the next reads and writes until you change it. Once the cluster is up and the training keyspace exists ([03 – Environment](03-environment.md)), you will run these commands in cqlsh and try different consistency levels in [03 – Environment](03-environment.md) and [04 – Lifecycle](04-lifecycle.md).
 
 ## 🧩 Components in DSE 6.8/6.9
 
@@ -104,18 +98,17 @@ SELECT * FROM training.sample LIMIT 1 USING CONSISTENCY ONE;
 | Port | Purpose |
 |------|--------|
 | 9042 | CQL native (clients) |
-| 9160 | Thrift (legacy) |
 | 7000 | Internode (gossip, streaming) |
 | 7199 | JMX (monitoring, nodetool) |
 
 ## 🧪 Relating This to Your Lab
 
-**Lab configuration:**
+**When you complete [03 – Environment](03-environment.md), your lab will have this configuration:**
 - **Cluster**: `DSE` (from `CLUSTER_NAME` in Compose).
 - **DC**: `DC1` (from `DC` in Compose).
-- **Nodes**: `dse-seed` + 2 scaled `node` containers; all in `DC1`, `Rack1`.
-- **Seeds**: Only `dse-seed`. Other nodes join via `SEEDS=dse-seed`.
-- **Keyspace**: `training` with `NetworkTopologyStrategy` and `'DC1': 3` — every row is replicated to all 3 nodes.
+- **Nodes**: `dse-seed` + 2 node containers; all in `DC1`, `Rack1`.
+- **Seeds**: Only `dse-seed`; other nodes join via `SEEDS=dse-seed`.
+- **Keyspace**: After you create it in Module 03, `training` will use `NetworkTopologyStrategy` and `'DC1': 3` — every row replicated to all 3 nodes.
 
 ## 🚀 Next
 

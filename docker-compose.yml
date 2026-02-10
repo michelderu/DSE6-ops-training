@@ -16,6 +16,8 @@ services:
       RACK: Rack1
       JVM_EXTRA_OPTS: "-Xms1G -Xmx1G -Xmn512M"
       SNITCH: GossipingPropertyFileSnitch
+      LC_ALL: C.UTF-8
+      LANG: C.UTF-8
     # Allow mlock: DSE locks heap in RAM to avoid swapping; Docker disables this by default.
     cap_add:
       - IPC_LOCK
@@ -24,9 +26,8 @@ services:
       memlock: -1
       nofile: 65536
     ports:
-      - "9042:9042"   # CQL native
-      - "9160:9160"   # Thrift
-      - "7199:7199"   # JMX
+      - "9042:9042"   # CQL native (DSE 6; Thrift/9160 removed)
+      - "7199:7199"   # JMX (nodetool, monitoring)
     healthcheck:
       test: ["CMD-SHELL", "grep -q 'DSE startup complete' /var/log/cassandra/system.log || exit 1"]
       interval: 15s
@@ -53,6 +54,8 @@ services:
       RACK: Rack1
       JVM_EXTRA_OPTS: "-Xms1G -Xmx1G -Xmn512M"
       SNITCH: GossipingPropertyFileSnitch
+      LC_ALL: C.UTF-8
+      LANG: C.UTF-8
     # Allow mlock: DSE locks heap in RAM to avoid swapping; Docker disables this by default.
     cap_add:
       - IPC_LOCK
@@ -88,6 +91,8 @@ services:
       RACK: Rack1
       JVM_EXTRA_OPTS: "-Xms1G -Xmx1G -Xmn512M"
       SNITCH: GossipingPropertyFileSnitch
+      LC_ALL: C.UTF-8
+      LANG: C.UTF-8
     # Allow mlock: DSE locks heap in RAM to avoid swapping; Docker disables this by default.
     cap_add:
       - IPC_LOCK

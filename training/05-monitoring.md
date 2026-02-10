@@ -209,11 +209,13 @@ Monitoring also includes **logs**. You can view logs in two ways:
 
 **Option 1: Using the logs script (recommended):**
 
+The script tails `/var/log/cassandra/system.log` inside the container (containers don't log much to stdout):
+
 ```bash
-# Follow all DSE node logs
+# Follow system.log on seed (default)
 ./scripts/logs.sh
 
-# Follow logs for a specific node
+# Follow system.log for a specific node
 ./scripts/logs.sh dse-seed
 ./scripts/logs.sh dse-node-1
 

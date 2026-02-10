@@ -25,18 +25,11 @@ while [ $# -gt 0 ]; do
   fi
 done
 
-# Use -T flag to disable TTY allocation when stdin is not a terminal (e.g., heredoc, pipe)
+# Use writable HOME so cqlsh can create ~/.cassandra for history (avoids "Cannot create directory" warning)
+
+# Use -T flag to disable TTY when stdin is not a terminal (e.g., heredoc, pipe)
 if [ -t 0 ]; then
-    # stdin is a terminal, use normal exec
-    # Use -T flag to disable TTY allocation when stdin is not a terminal (e.g., heredoc, pipe)
-if [ -t 0 ]; then
-    # stdin is a terminal, use normal exec
-    $COMPOSE_CMD exec dse-seed cqlsh "${CQLSH_ARGS[@]}"
+    $COMPOSE_CMD exec -e HOME=/tmp dse-seed cqlsh "${CQLSH_ARGS[@]}"
 else
-    # stdin is not a terminal (heredoc/pipe), disable TTY
-    $COMPOSE_CMD exec -T dse-seed cqlsh "${CQLSH_ARGS[@]}"
-fi
-else
-    # stdin is not a terminal (heredoc/pipe), disable TTY
-    $COMPOSE_CMD exec -T dse-seed cqlsh "${CQLSH_ARGS[@]}"
+    $COMPOSE_CMD exec -T -e HOME=/tmp dse-seed cqlsh "${CQLSH_ARGS[@]}"
 fi

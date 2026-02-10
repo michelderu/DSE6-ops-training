@@ -55,17 +55,66 @@ Backups protect the durable state: **commit log** (in-flight writes) and **SSTab
 
 ## Backup concepts
 
-- **Snapshot**: On-disk copy of SSTable files for a keyspace/table at a point in time. Stored under `data/<keyspace>/<table>/snapshots/<snapshot_name>`. You run it when you want a full point-in-time backup; DSE creates the copy on the node (hard-links or copies). Snapshots stay on the node unless you copy them off yourself.
-- **Incremental backup**: DSE tracks which flushed SSTables (and optionally commit logs) are new or changed since the last backup so you can copy only those files off the node. DSE does **not** copy files for you—it marks which files need to be backed up; your own process or scripts copy them. Use it for ongoing backups so each run backs up only deltas.
-- **What is actually in each:**
-   - **Snapshot** = a copy of **all SSTable files** for the keyspace/table(s) you snapshot, as they exist on that node when you run it (full set of flushed data; no commit log). 
-   - **Incremental backup** = **only the SSTable files (and optionally commit log segments) that are new or changed since your last backup run**—each run is a delta (new flushes/compactions). 
-   - Restore = **base** (full snapshot or full backup) **+** apply **all incremental copies in order**.  
-- **Restore**: Replace data directories with snapshot/incremental files and restart (or use **sstableloader** to load into a new cluster).
-   - For a single node: shell into the container (`./scripts/shell.sh` or `./scripts/shell.sh <service>`), run `dse cassandra-stop`, restore that node’s backup into its data directory, then run `dse cassandra` to start DSE again (or restart the container).
-   - **In a cluster with multiple nodes**: each node has its own data and its own backup. Restore **each node from the backup that was taken on that node** (or from a backup of a replica if you are replacing a failed node). Do not mix backups from different nodes. 
+**DSE Backup & Restore: Snapshots vs. Incremental**
 
-Typical approaches:
+- **Snapshot (The "Base")**
+  - **What is it?**  
+    A snapshot is a point-in-time backup consisting of hard links to all SSTable files (immutable, flushed table data) for a specific keyspace or table on that node. This creates a consistent view of the persisted data at the exact instant the snapshot is taken, without interrupting database activity.
+  - **How is it triggered?**  
+    Snapshots are taken manually using the `nodetool snapshot` command.
+  - **Where are they stored?**  
+    Each snapshot is stored on the same node under `data/<keyspace>/<table>/snapshots/<snapshot_name>`.
+  - **Management**  
+    Snapshots are never removed automatically by DSE—you must manage them yourself (cleanup is done with `nodetool clearsnapshot` or by deleting the snapshot directories).
+
+  - **What does a snapshot NOT include?**  
+    Snapshots capture **only the SSTable files** present on disk at the time of the snapshot. They do **not** include:
+    - Unflushed writes in the memtable (data that has not yet been written to SSTables—this is still only in memory or the commit log)
+    - The active **commit log** (the commit log is not part of a snapshot and must be backed up separately if point-in-time recovery or full durability is required)
+    - The contents of the `/backups/` directory (used by incremental backup)
+    - Configuration files, schema history, user-defined functions, or any data outside of the main SSTables
+
+    In short, a snapshot gives you a persistent, on-disk backup, but any data that hasn’t been flushed to disk as an SSTable prior to the snapshot is **not** included. For complete protection (especially to prevent data loss on sudden crashes), combine snapshots with commit log backups.
+
+- **Incremental Backup (The "Delta")**
+  - **What is it?**  
+    Incremental backup is a mechanism that captures *just the new* SSTable files created after a full snapshot (the "base"). Every time DSE flushes a memtable to disk and creates a new SSTable, it also places a hard link to that file in the corresponding `backups` directory—*if* incremental backup is enabled. This allows you to capture only the data changes (the "delta") that occurred after your last snapshot, making it possible to restore the database to any point since that snapshot by combining the base snapshot and its incremental backups.
+  - **How does it relate to snapshots?**  
+    Snapshots capture the complete, point-in-time state of all SSTables as your base backup. Incremental backups then collect any new SSTables created after the snapshot, so you don't have to take a full backup every time. To restore to the present, you combine the last snapshot with all incremental SSTables created since.
+  - **What is *not* included?**  
+    Incremental backup only saves new SSTables and does *not* capture:
+    - SSTables that existed before the last snapshot (those are in the snapshot, not increments)
+    - The active commit log (needed for point-in-time crash recovery—you must copy or archive this separately)
+    - Unflushed writes (data still in memtables)
+    - Other node or schema data outside SSTables
+  - **How is it triggered?**  
+    This happens automatically—*but only if* you have `incremental_backups: true` set in `cassandra.yaml`.
+  - **Where are they stored?**  
+    Every incremental SSTable copy appears under `data/<keyspace>/<table>/backups/` on each node.
+  - **"Last Backup" Logic:**  
+    DSE does *not* know when you last copied incremental files—the `/backups/` folder accumulates SSTables until you or your backup script copies them somewhere else (and optionally clears the directory). "Files since last backup" means everything in `/backups/` since your last manual or scripted backup.
+
+- **How Snapshots, Incrementals, and Commit Logs Work Together (Workflow and Backing Up In-Flight Data)**
+
+  Snapshots and incremental backups *do not* capture unflushed/in-flight writes currently stored only in the commit log (i.e., data that is still in memory or has not yet been flushed to SSTables). To fully protect against data loss—including the most recent in-flight updates—you must **back up the commit log files** in addition to snapshots and incrementals.
+
+  **Recommended backup workflow:**
+  1. **Take a Full Snapshot:** This serves as your "base" recovery point (e.g., at time T₀). All SSTables flushed at this point are included.
+  2. **Clear Incremental Backups:** Immediately after the snapshot, empty all `/backups/` folders on all nodes to remove any old incremental SSTable files.
+  3. **Back Up Commit Logs:** As soon as the snapshot is taken, copy the contents of the commit log directory (`/var/lib/cassandra/commitlog/` in each node) to your backup location. Do this *before* restarting or flushing nodes, so all in-flight data is preserved.
+  4. **Ongoing Incrementals and Commit Logs:** On a regular schedule (e.g., hourly), copy any new SSTables found in the `/backups/` folders as well as any new (not-yet-backed-up) commit log files from `/var/lib/cassandra/commitlog/` on each node to your backup location. After copying, you can clear the `/backups/` directories, but best practice is to **not** remove commit logs until they have been confirmed safely archived and applied after restoration.
+  
+  **Summary:**  
+  - **Snapshot:** Point-in-time backup of flushed SSTables  
+  - **Incremental:** Backup of newly created SSTables (deltas)  
+  - **Commit logs:** Backup of all recent in-flight writes not yet flushed; required for full point-in-time recovery up to the most recent possible state.  
+
+  > **Note:** To restore to the *exact* state of a node, restore the latest snapshot, apply all incremental SSTables, and then replay the backed-up commit logs.  
+
+  > **IMPORTANT: Backups Are Node-Specific!**  
+  > Each node in a multi-node cluster contains distinct data—do *not* restore a backup from Node A to Node B. Always restore each node using its own backups, or (if replacing a failed node) the backups from a replica of the same token range.
+
+Granular approaches:
    1. **Full-cluster restore** — stop all nodes, restore each node’s data directory from that node’s backup (snapshot + incremental in order), then start all nodes (e.g. seed first, then others).
    2. **Single-node restore** — stop only that node, restore its data from its backup, restart it; the rest of the cluster stays up.
    3. **Restore to a new cluster** — use **sstableloader** to load SSTables from backup into a new or existing cluster without replacing data dirs; useful for cloning or migrating. See [DSE 6.8 Backup and Restore](https://docs.datastax.com/en/dse/6.8/managing/in-memory/backup-restore-data.html) or [DSE 6.9 Backup and Restore](https://docs.datastax.com/en/dse/6.9/managing/in-memory/backup-restore-data.html) for step-by-step procedures.

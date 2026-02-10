@@ -12,7 +12,7 @@ A **comprehensive DataStax Enterprise 6.8 and 6.9 training** for operations team
 
 - 🐳 **Docker** or **Colima**:
   - **Docker**: Docker Engine + Docker Compose (`docker-compose` or plugin `docker compose`)
-  - **Colima**: Colima (provides Docker-compatible daemon; install with `brew install colima`). On **Apple Silicon (arm64)** start Colima with an x86_64 VM so the DSE image (linux/amd64) runs natively: `colima start --arch x86_64`. On Intel Macs: `colima start`.
+  - **Colima**: Colima (provides Docker-compatible daemon; install with `brew install colima`). On **Apple Silicon (arm64)** start Colima with an x86_64 VM so the DSE image (linux/amd64) runs natively: `colima start --cpu 6 --memory 12 --disk 60 --arch aarch64 --vm-type vz`. On Intel Macs: `colima start --cpu 4 --memory 8 --disk 20 `.
 - 💻 **4 GB+ RAM** for the host (8 GB recommended for 3-node cluster)
 - 💿 A few GB free disk for images and data
 
@@ -68,7 +68,7 @@ Start with **[training/00-overview.md](training/00-overview.md)** and follow the
 | `scripts/nodetool-node.sh` | 🔧 Run `nodetool` on a specific node (e.g. `./scripts/nodetool-node.sh dse-node-1 status`) |
 | `scripts/dsetool.sh` | 🔐 Run `dsetool` on the seed (e.g. `./scripts/dsetool.sh encryptconfigvalue "password"`) |
 | `scripts/dsetool-node.sh` | 🔐 Run `dsetool` on a specific node (e.g. `./scripts/dsetool-node.sh dse-node-1 status`) |
-| `scripts/logs.sh` | 📋 View logs easily (e.g. `./scripts/logs.sh dse-seed` or `./scripts/logs.sh dse-seed --tail 50`) |
+| `scripts/logs.sh` | 📋 Tail `/var/log/cassandra/system.log` in container (e.g. `./scripts/logs.sh dse-seed` or `./scripts/logs.sh dse-seed --tail 50`) |
 | `scripts/reset-cluster.sh` | 🔄 Reset cluster (stop, remove data, optionally restart) |
 | `scripts/shell.sh` | 🐚 Open an interactive shell in a container (e.g. `./scripts/shell.sh` or `./scripts/shell.sh dse-node-1`) |
 

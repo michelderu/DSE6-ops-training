@@ -104,7 +104,7 @@ DESCRIBE KEYSPACES;
 exit
 ```
 
-## Step 6: 📝 Optional — Create a Training Keyspace
+## Step 6: 📝 Optional but recommended — Create a Training Keyspace
 
 So later modules have something to backup and repair:
 
@@ -113,6 +113,37 @@ So later modules have something to backup and repair:
 ```
 
 💡 **Alternative**: Run the same statements inline with `./scripts/cqlsh.sh -e "..."` (see the CQL file for the full script).
+
+## Step 7: 🔍 See replication and consistency (from Module 02)
+
+Now that the cluster and training keyspace exist, you can try the concepts from [02 – Cluster Architecture](02-cluster-architecture.md):
+
+**See the keyspace replication** (NetworkTopologyStrategy, DC1: 3):
+
+```bash
+./scripts/cqlsh.sh -e "DESCRIBE KEYSPACE training;"
+```
+
+**Try consistency levels in cqlsh** (session-level; set with `CONSISTENCY <level>;` then run a query):
+
+```bash
+./scripts/cqlsh.sh
+```
+
+In cqlsh:
+
+```cql
+CONSISTENCY ONE;
+SELECT * FROM training.sample LIMIT 1;
+
+CONSISTENCY QUORUM;
+SELECT * FROM training.sample LIMIT 1;
+
+CONSISTENCY;
+exit
+```
+
+💡 `CONSISTENCY;` with no argument shows the current session level.
 
 ## 📁 Important paths and files in the container
 
