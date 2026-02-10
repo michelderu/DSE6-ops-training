@@ -1,0 +1,120 @@
+# DSE 6.8/6.9 Operations Training - Docker Compose
+# See README.md and training/ for usage and curriculum.
+# Bootstrap order: dse-seed first, then dse-node-1, dse-node-2 (use scripts/up-cluster.sh).
+# Service, container, and hostname are the same for each node: dse-seed, dse-node-1, dse-node-2.
+
+services:
+  dse-seed:
+    image: "${DSE_IMAGE:-datastax/dse-server:6.8.62-ubi7}"
+    platform: linux/amd64
+    container_name: dse-seed
+    hostname: dse-seed
+    environment:
+      DS_LICENSE: accept
+      CLUSTER_NAME: "${CLUSTER_NAME:-DSE}"
+      DC: "${DC:-DC1}"
+      RACK: Rack1
+      JVM_EXTRA_OPTS: "-Xms1G -Xmx1G -Xmn512M"
+      SNITCH: GossipingPropertyFileSnitch
+    # Allow mlock: DSE locks heap in RAM to avoid swapping; Docker disables this by default.
+    cap_add:
+      - IPC_LOCK
+    # memlock: unlimited so mlock() can lock heap; nofile: many FDs for connections and SSTables.
+    ulimits:
+      memlock: -1
+      nofile: 65536
+    ports:
+      - "9042:9042"   # CQL native
+      - "9160:9160"   # Thrift
+      - "7199:7199"   # JMX
+    healthcheck:
+      test: ["CMD-SHELL", "grep -q 'DSE startup complete' /var/log/cassandra/system.log || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 30
+      start_period: 120s
+    volumes:
+      - .:/workspace # To access the sample-keyspace.cql file from the host machine
+      - dse-seed-data:/var/lib/cassandra # Persistent data volume for seed node
+      - ./config:/config # Custom config files (cassandra.yaml, dse.yaml) - DSE startup script swaps these with defaults
+    networks:
+      dse-net:
+
+  dse-node-1:
+    image: "${DSE_IMAGE:-datastax/dse-server:6.8.62-ubi7}"
+    platform: linux/amd64
+    container_name: dse-node-1
+    hostname: dse-node-1
+    environment:
+      DS_LICENSE: accept
+      CLUSTER_NAME: "${CLUSTER_NAME:-DSE}"
+      SEEDS: dse-seed
+      DC: "${DC:-DC1}"
+      RACK: Rack1
+      JVM_EXTRA_OPTS: "-Xms1G -Xmx1G -Xmn512M"
+      SNITCH: GossipingPropertyFileSnitch
+    # Allow mlock: DSE locks heap in RAM to avoid swapping; Docker disables this by default.
+    cap_add:
+      - IPC_LOCK
+    # memlock: unlimited so mlock() can lock heap; nofile: many FDs for connections and SSTables.
+    ulimits:
+      memlock: -1
+      nofile: 65536
+    depends_on:
+      dse-seed:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "grep -q 'DSE startup complete' /var/log/cassandra/system.log || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 30
+      start_period: 120s
+    volumes:
+      - ./config:/config # Custom config files (cassandra.yaml, dse.yaml) - DSE startup script swaps these with defaults
+      - dse-node-1-data:/var/lib/cassandra # Persistent data volume for node 1
+    networks:
+      dse-net:
+
+  dse-node-2:
+    image: "${DSE_IMAGE:-datastax/dse-server:6.8.62-ubi7}"
+    platform: linux/amd64
+    container_name: dse-node-2
+    hostname: dse-node-2
+    environment:
+      DS_LICENSE: accept
+      CLUSTER_NAME: "${CLUSTER_NAME:-DSE}"
+      SEEDS: dse-seed
+      DC: "${DC:-DC1}"
+      RACK: Rack1
+      JVM_EXTRA_OPTS: "-Xms1G -Xmx1G -Xmn512M"
+      SNITCH: GossipingPropertyFileSnitch
+    # Allow mlock: DSE locks heap in RAM to avoid swapping; Docker disables this by default.
+    cap_add:
+      - IPC_LOCK
+    # memlock: unlimited so mlock() can lock heap; nofile: many FDs for connections and SSTables.
+    ulimits:
+      memlock: -1
+      nofile: 65536
+    depends_on:
+      dse-node-1:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "grep -q 'DSE startup complete' /var/log/cassandra/system.log || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 30
+      start_period: 120s
+    volumes:
+      - ./config:/config # Custom config files (cassandra.yaml, dse.yaml) - DSE startup script swaps these with defaults
+      - dse-node-2-data:/var/lib/cassandra # Persistent data volume for node 2
+    networks:
+      dse-net:
+
+networks:
+  dse-net:
+    driver: bridge
+
+volumes:
+  dse-seed-data:
+  dse-node-1-data:
+  dse-node-2-data:
