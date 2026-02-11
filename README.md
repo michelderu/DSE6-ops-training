@@ -2,6 +2,40 @@
 
 A **comprehensive DataStax Enterprise 6.8 and 6.9 training** for operations teams, using a **local Docker or Colima** environment with Compose so you can run everything on your laptop with minimal setup.
 
+## About DataStax Enterprise (DSE)
+
+**DataStax Enterprise (DSE)** is a production-ready, distributed database built on Apache Cassandra®. DSE extends Cassandra with advanced features for enterprise workloads, including search, analytics, graph, and AI/ML capabilities.
+
+### Core Database Features
+
+- **Distributed Architecture**: Multi-datacenter, fault-tolerant design with automatic replication and sharding
+- **Zero-Copy Streaming**: Up to 4x faster streaming, repair, and node operations compared to earlier versions
+- **NodeSync**: Continuous background repair that eliminates manual repair scheduling for most workloads
+- **Storage-Attached Indexing (SAI)**: High-performance secondary indexing with 43x better write throughput and 230x better latency than traditional secondary indexes
+
+### Advanced Workloads
+
+- **DSE Search**: Full-text search capabilities powered by Apache Solr
+- **DSE Analytics**: Batch and streaming analytics with Apache Spark and AlwaysOn SQL
+- **DSE Graph**: Graph database with Gremlin traversal language for relationship queries
+- **Vector Search** (DSE 6.9): AI/ML workloads with vector embeddings and similarity search, powered by JVector engine (10x faster than Lucene-based search)
+
+### Enterprise Features
+
+- **DSE Advanced Security**: Role-based access control (RBAC), LDAP integration, Kerberos authentication, and transparent data encryption
+- **Backup & Restore Service**: CQL-based automated backup and restore operations
+- **Multi-Datacenter Support**: Built-in replication across datacenters with configurable consistency levels
+
+### DSE 6.8 vs 6.9
+
+This training covers both DSE 6.8 and 6.9. While both versions share core features like zero-copy streaming and NodeSync, **DSE 6.9** introduces significant new capabilities:
+
+- **Vector Search**: Native support for vector embeddings and similarity search (requires Vector Add-on)
+- **Enhanced SAI**: Text analyzers for semantic filtering and OR operator support in queries
+- **Vector Indexing**: Native VECTOR data type indexing and querying
+
+For a detailed feature comparison, see the **[DSE 6.8 vs 6.9 Functional Comparison](training/labs/dse6-features.md#dse-68-vs-69-functional-comparison)** table in the [DSE 6 Features Lab](training/labs/dse6-features.md).
+
 ## What’s Included
 
 - 🐳 **Docker or Colima** Compose stack: 3-node DSE 6.8/6.9 cluster

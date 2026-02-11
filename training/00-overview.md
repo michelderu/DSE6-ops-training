@@ -11,7 +11,7 @@ By the end of this training you will be able to:
 - ⚙️ Perform day-to-day operations: start/stop, status, add/remove nodes
 - 📊 Monitor the cluster with **nodetool** (and JMX/logs)
 - 💾 Run **backup** (snapshots, incremental) and **restore**
-- 🔧 Schedule and interpret **repair** (anti-entropy)
+- 🔧 Schedule and interpret **repair** (anti-entropy) and use **NodeSync** (DSE 6 continuous background repair)
 - 🐛 Apply basic **security** and **troubleshooting** practices
 
 ## 📋 Prerequisites
@@ -34,7 +34,7 @@ By the end of this training you will be able to:
 | [04 – Lifecycle](04-lifecycle.md) ⚙️ | Start, stop, scale, status | Day-to-day control |
 | [05 – Monitoring](05-monitoring.md) 📊 | nodetool, JMX, logs | Health and performance |
 | [06 – Backup & Restore](06-backup-restore.md) 💾 | Snapshots, incremental backup | Data protection |
-| [07 – Repair & Maintenance](07-repair-maintenance.md) 🔧 | Anti-entropy repair, cleanup | Consistency and disk |
+| [07 – Repair & Maintenance](07-repair-maintenance.md) 🔧 | Anti-entropy repair, NodeSync (DSE 6), cleanup | Consistency and disk |
 | [08 – Troubleshooting](08-troubleshooting.md) 🐛 | Logs, common failures, recovery | When things go wrong |
 | [09 – DSE Config](09-dse-config.md) 🔐 | dsetool, configuration encryption | DSE-specific configuration tasks |
 | [10 – Advanced Operations](10-advanced-operations.md) 🚫 | Decommission, removenode, tokens | Advanced cluster operations |
@@ -57,10 +57,10 @@ By the end of this training you will be able to:
 
 This training covers both DSE 6.8 and 6.9. Key differences:
 
-- **DSE 6.9 improvements**: Zero-copy streaming provides up to 4x faster streaming, repair, and node operations compared to DSE 6.8
+- **Zero-copy streaming**: Provides up to 4x faster streaming, repair, and node operations compared to earlier versions
+- **NodeSync**: Continuous background repair that can replace traditional `nodetool repair` for most workloads (see [07 – Repair & Maintenance](07-repair-maintenance.md))
 - **Compatibility**: DSE 6.9 is backward compatible with DSE 6.8
 - **Upgrade path**: DSE 6.8 → DSE 6.9 (one node at a time, see upgrade documentation)
-- **Features**: Most features are identical; DSE 6.9 focuses on performance improvements
 
 💡 **Note**: When a feature or command differs between versions, it will be noted in the training materials.
 

@@ -89,7 +89,7 @@ Once the cluster is up (Module 03), you will run `DESCRIBE KEYSPACE training;` i
 
 💡 **Our Docker Compose image** runs the **database (transactional)** profile only.
 
-💡 **DSE 6.9 improvements**: DSE 6.9 includes significant performance improvements including 4x faster streaming and zero-copy streaming capabilities, making node recovery and addition much faster than previous versions.
+💡 **Performance improvements**: DSE 6.8 and 6.9 include zero-copy streaming capabilities, providing up to 4x faster streaming, making node recovery and addition much faster than earlier versions.
 
 📚 **For deeper understanding of Cassandra internals**, see [01 – Database Architecture](01-database-architecture.md) which covers gossip, storage engine, reads/writes, compaction, and repair mechanisms in detail.
 

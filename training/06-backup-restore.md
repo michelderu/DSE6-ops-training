@@ -55,6 +55,16 @@ Backups protect the durable state: **commit log** (in-flight writes) and **SSTab
 
 ## Backup concepts
 
+**DSE 6.8/6.9 Backup Options:**
+
+DSE 6.8/6.9 provides multiple backup methods:
+
+1. **Snapshots** (`nodetool snapshot`) — Traditional point-in-time backups (covered in this module)
+2. **Incremental backup** — Tracks changed SSTables since last backup (covered in this module)
+3. **DSE Backup and Restore Service** — CQL-based automated backup service (not covered in this training; see [DSE 6.9 Backup and Restore Service](https://docs.datastax.com/en/dse/6.9/managing/operations/backup-restore-service-contents.html) for production use)
+
+💡 **For this training**: We focus on snapshots and incremental backup, which are the standard methods for operations teams. The Backup and Restore Service provides policy-based automation but requires additional setup.
+
 **DSE Backup & Restore: Snapshots vs. Incremental**
 
 - **Snapshot (The "Base")**
@@ -230,7 +240,7 @@ Then create the snapshot as above.
    - Start DSE again: inside the container run `dse cassandra`, or exit and restart the container.
 2. **Restore into a new cluster**: use **sstableloader** to load snapshot SSTables into a new cluster (same topology/schema). See [DSE 6.8 sstableloader](https://docs.datastax.com/en/dse/6.8/managing/tools/sstableloader/) or [DSE 6.9 sstableloader](https://docs.datastax.com/en/dse/6.9/managing/tools/sstableloader/) documentation.
 
-💡 **DSE 6.9 Performance Note**: Restore operations benefit from zero-copy streaming improvements in DSE 6.9, making data loading faster than in DSE 6.8.
+💡 **Performance Note**: Restore operations benefit from zero-copy streaming (available in both DSE 6.8 and 6.9), making data loading significantly faster compared to earlier versions.
 
 For the lab, creating and listing snapshots and running cleanup is enough; full restore can be read in the docs and practiced in a dedicated exercise.
 

@@ -702,4 +702,4 @@ Go to [11 – Production Readiness](11-production-readiness.md) for production d
 - [DSE 6.8 Hinted Handoff](https://docs.datastax.com/en/dse/6.8/managing/operations/opsHintedHandoff.html)
 - [DSE 6.9 Hinted Handoff](https://docs.datastax.com/en/dse/6.9/managing/operations/opsHintedHandoff.html)
 
-💡 **DSE 6.9 Performance Note**: Decommissioning and node addition operations are significantly faster in DSE 6.9 due to zero-copy streaming improvements (up to 4x faster than DSE 6.8).
+💡 **Performance Note**: Decommissioning and node addition operations benefit from zero-copy streaming (available in both DSE 6.8 and 6.9), providing up to 4x faster performance compared to earlier versions.

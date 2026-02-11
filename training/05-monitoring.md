@@ -2,7 +2,7 @@
 
 Use **nodetool** (and JMX/logs) to monitor DSE 6.8/6.9 cluster health and performance. All commands are run in the Docker or Colima environment from the repo root.
 
-💡 **DSE 6.9 Note**: Monitoring metrics remain consistent between DSE 6.8 and 6.9, but you may notice improved performance metrics (faster repair, streaming) in DSE 6.9 due to zero-copy streaming.
+💡 **Note**: Monitoring metrics remain consistent between DSE 6.8 and 6.9. Both versions benefit from zero-copy streaming, which provides improved performance metrics (faster repair, streaming) compared to earlier versions.
 
 ## 🎯 Goals
 
@@ -191,6 +191,42 @@ Inspect or set compaction throughput (MB/s). Lower values reduce I/O pressure.
 - **When to lower** — If the node is I/O-bound, read/write latency is high, or **tpstats** shows many pending reads/writes, lower compaction throughput to give application traffic priority. Use **compactionstats** to confirm pending doesn't grow unbounded.
 - **When to raise** — If **compactionstats** pending keeps growing and the node has I/O headroom, raise throughput to catch up. Don't set so high that compaction starves reads and writes.
 - **Persistence** — Changes are typically in-memory only until applied via config or restart; document and apply the desired value in configuration for durability.
+
+### nodesyncservice (DSE 6.8/6.9)
+
+Monitor and manage the **NodeSync service** (continuous background repair). See [07 – Repair & Maintenance](07-repair-maintenance.md) for details on NodeSync.
+
+**Check NodeSync status:**
+
+```bash
+./scripts/nodetool.sh nodesyncservice status
+```
+
+**Get current rate limit:**
+
+```bash
+./scripts/nodetool.sh nodesyncservice getrate
+```
+
+**Set rate limit** (temporarily, in KB/s):
+
+```bash
+./scripts/nodetool.sh nodesyncservice setrate 2048
+```
+
+**Simulate rate requirements:**
+
+```bash
+./scripts/nodetool.sh nodesyncservice ratesimulator
+```
+
+**What to look for:**
+
+- **Service status** — NodeSync service should be running (starts automatically with DSE). Use `nodesyncservice status` to verify.
+- **Rate limit** — NodeSync rate should be sufficient to meet the `gc_grace_seconds` deadline for tables. Use `ratesimulator` to determine appropriate rate.
+- **CPU overhead** — Monitor CPU usage; NodeSync may have higher CPU overhead than traditional repair for write-heavy workloads (>20% writes).
+
+💡 **Note**: Tables with NodeSync enabled are automatically skipped by `nodetool repair`. If you see repair operations skipping tables, check if NodeSync is enabled on those tables.
 
 ## JMX and Metrics
 

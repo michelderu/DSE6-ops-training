@@ -2,7 +2,7 @@
 
 Manage the DSE 6.8/6.9 cluster: start, stop, check status, and understand scaling in the Docker Compose environment.
 
-💡 **DSE 6.9 Note**: Node addition and bootstrap operations are significantly faster in DSE 6.9 due to zero-copy streaming improvements (up to 4x faster than DSE 6.8).
+💡 **Note**: Node addition and bootstrap operations benefit from zero-copy streaming (available in both DSE 6.8 and 6.9), providing up to 4x faster performance compared to earlier versions.
 
 ## 🎯 Goals
 

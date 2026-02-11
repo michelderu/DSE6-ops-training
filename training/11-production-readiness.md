@@ -86,6 +86,7 @@ Prepare your DSE cluster for production deployment. This module covers essential
 - [ ] **Change management**: Process for configuration changes
 - [ ] **Capacity planning**: Growth projections and scaling plan
 - [ ] **Maintenance windows**: Scheduled maintenance procedures
+- [ ] **Repair strategy**: NodeSync enabled for appropriate tables, or scheduled `nodetool repair` (see [07 – Repair & Maintenance](07-repair-maintenance.md))
 - [ ] **Documentation**: Architecture and operational docs
 
 ## 🔒 Security Best Practices
@@ -238,6 +239,43 @@ nodetool snapshot -t daily_${DATE}
 # Copy snapshots to S3/NFS
 aws s3 sync /var/lib/cassandra/data s3://backup-bucket/daily_${DATE}/
 ```
+
+### Repair Strategy (DSE 6.8/6.9)
+
+**Choose between NodeSync and traditional repair:**
+
+**NodeSync (recommended for most workloads):**
+- ✅ Continuous background repair, no manual scheduling
+- ✅ Automatic consistency maintenance
+- ✅ Best for read-heavy or balanced workloads (writes < 20% of operations)
+- ⚠️ May have higher CPU overhead for write-heavy workloads
+
+**Enable NodeSync on production tables:**
+
+```cql
+ALTER TABLE my_keyspace.my_table WITH nodesync = true;
+```
+
+**Monitor NodeSync:**
+
+```bash
+nodetool nodesyncservice status
+nodetool nodesyncservice getrate
+```
+
+**Traditional `nodetool repair` (for write-heavy workloads):**
+- ✅ Lower CPU overhead for write-heavy workloads (>20% writes)
+- ✅ Explicit control over repair timing
+- ⚠️ Requires scheduling and monitoring
+
+**Repair schedule example:**
+
+```bash
+# Run primary-only repair weekly
+nodetool repair -pr -full
+```
+
+💡 **Best practice**: Prefer NodeSync for most tables. Use `nodetool repair` only for write-heavy workloads where NodeSync CPU overhead is too high, or when NodeSync is disabled. See [07 – Repair & Maintenance](07-repair-maintenance.md) for details.
 
 ### Disaster Recovery Plan
 
@@ -400,7 +438,8 @@ rack=RACK1
 ### Tools
 
 - **DataStax OpsCenter**: Management and monitoring (if available)
-- **Reaper**: Automated repair scheduling
+- **NodeSync** (DSE 6.8/6.9): Continuous background repair (preferred for most workloads; see [07 – Repair & Maintenance](07-repair-maintenance.md))
+- **Reaper**: Automated repair scheduling (alternative to NodeSync for write-heavy workloads)
 - **Medusa**: Backup and restore tool
 - **Cassandra Reaper**: Repair management
 

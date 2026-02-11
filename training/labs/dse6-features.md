@@ -5,7 +5,7 @@ Hands-on exercises to explore DSE 6.8 and 6.9 specific features and improvements
 ## 🎯 Lab Objectives
 
 - Explore DSE 6.8 and 6.9 performance improvements
-- Understand zero-copy streaming benefits (DSE 6.9)
+- Understand zero-copy streaming benefits (available in DSE 6.8 and 6.9)
 - Practice with DSE 6 specific utilities and commands
 - Compare DSE 6.8 vs 6.9 behavior where applicable
 
@@ -38,9 +38,9 @@ Hands-on exercises to explore DSE 6.8 and 6.9 specific features and improvements
 
 **Expected output**: Should show DSE 6.8.x or 6.9.x version information.
 
-## 🟡 Intermediate: Zero-Copy Streaming Performance (DSE 6.9)
+## 🟡 Intermediate: Zero-Copy Streaming Performance
 
-**Note**: This exercise demonstrates the performance improvements in DSE 6.9. If you're using DSE 6.8, you can still complete the exercise but won't see the same performance benefits.
+**Note**: Zero-copy streaming is available in both DSE 6.8 and 6.9, providing up to 4x faster streaming, repair, and node operations compared to earlier versions.
 
 ### Exercise 2: Measure Streaming Performance During Repair
 
@@ -79,13 +79,13 @@ Hands-on exercises to explore DSE 6.8 and 6.9 specific features and improvements
    echo "Repair duration: ${DURATION} seconds"
    ```
 
-4. **Compare with DSE 6.8** (if you have access to both):
-   - DSE 6.9 should complete repair significantly faster (up to 4x) due to zero-copy streaming
-   - Note the difference in streaming throughput shown in `netstats`
+4. **Observe streaming performance**:
+   - Both DSE 6.8 and 6.9 use zero-copy streaming, completing repair significantly faster (up to 4x) compared to earlier versions
+   - Note the streaming throughput shown in `netstats`
 
-**Key Learning**: DSE 6.9's zero-copy streaming makes repair, node addition, and recovery operations much faster.
+**Key Learning**: Zero-copy streaming (available in both DSE 6.8 and 6.9) makes repair, node addition, and recovery operations much faster compared to earlier versions.
 
-## 🟡 Intermediate: Node Addition Performance (DSE 6.9)
+## 🟡 Intermediate: Node Addition Performance
 
 ### Exercise 3: Add a Node and Measure Bootstrap Time
 
@@ -126,7 +126,7 @@ Hands-on exercises to explore DSE 6.8 and 6.9 specific features and improvements
    ./scripts/nodetool-node.sh dse-node-2 netstats
    ```
 
-**Key Learning**: DSE 6.9's zero-copy streaming makes node bootstrap and data streaming much faster.
+**Key Learning**: Zero-copy streaming (available in both DSE 6.8 and 6.9) makes node bootstrap and data streaming much faster compared to earlier versions.
 
 ## 🔴 Advanced: Performance Comparison Lab
 
@@ -175,43 +175,90 @@ Hands-on exercises to explore DSE 6.8 and 6.9 specific features and improvements
    ./scripts/nodetool.sh describecluster
    ```
 
-2. **Review DSE 6.9 release notes** for new features:
-   - Zero-copy streaming
+2. **Review DSE 6.8 and 6.9 release notes** for features:
+   - Zero-copy streaming (available in both versions)
+   - Vector search (DSE 6.9 only)
+   - SAI enhancements (text analyzers, OR operator in DSE 6.9)
    - Improved repair performance
-   - Enhanced monitoring capabilities
 
-3. **Document differences**:
-   - Create a comparison table of DSE 6.8 vs 6.9 features
+3. **Compare with the feature table**:
+   - Review the [DSE 6.8 vs 6.9 Functional Comparison](#dse-68-vs-69-functional-comparison) table below
    - Note which features are available in your version
-   - Identify upgrade considerations
+   - Identify upgrade considerations if planning to move from 6.8 to 6.9
 
-**Key Learning**: Understand what features are available in DSE 6.8 vs 6.9 and plan upgrades accordingly.
+**Key Learning**: Understand what features are available in DSE 6.8 vs 6.9 and plan upgrades accordingly. DSE 6.9 adds vector search capabilities and enhanced SAI features for AI/ML workloads.
 
-## 📚 DSE 6.8 vs 6.9 Key Differences
+## 📚 DSE 6.8 vs 6.9 Functional Comparison
 
-### Performance Improvements (DSE 6.9)
+### Feature Comparison Table
 
-- **Zero-copy streaming**: Up to 4x faster streaming, repair, and node operations
-- **Improved recovery**: Faster recovery from node failures
-- **Enhanced node addition**: Faster bootstrap and data streaming
+| Feature | DSE 6.8 | DSE 6.9 | Notes |
+|---------|---------|---------|-------|
+| **Core Database** |
+| Zero-copy streaming | ✅ | ✅ | Up to 4x faster streaming, repair, and node operations |
+| NodeSync | ✅ | ✅ | Continuous background repair |
+| Storage-Attached Indexing (SAI) | ✅ | ✅ | Secondary indexing with improved performance |
+| SAI text analyzers | ❌ | ✅ | Enable semantic filtering and term matching on strings |
+| SAI OR operator | ❌ | ✅ | OR logic support in SAI queries (in addition to AND) |
+| SAI vector indexing | ❌ | ✅ | Index and query VECTOR data type |
+| **Vector Search** |
+| Vector search (JVector) | ❌ | ✅ | 10x faster than Lucene-based search; requires Vector Add-on |
+| Vector embeddings (VECTOR type) | ❌ | ✅ | Fixed-dimensionality vector storage |
+| Vector similarity search | ❌ | ✅ | RAG and AI agent use cases |
+| **Search & Indexing** |
+| DSE Search (Solr) | ✅ | ✅ | Full-text search capabilities |
+| Secondary indexes (2i) | ✅ | ✅ | Traditional secondary indexing |
+| **Analytics** |
+| DSE Analytics (Spark) | ✅ | ✅ | Batch and streaming analytics |
+| AlwaysOn SQL | ✅ | ✅ | SQL interface for Spark |
+| **Graph** |
+| DSE Graph | ✅ | ✅ | Graph database with Gremlin |
+| **Security** |
+| DSE Advanced Security | ✅ | ✅ | RBAC, LDAP, Kerberos, encryption |
+| **Operations** |
+| Backup & Restore Service | ✅ | ✅ | CQL-based automated backup |
+| Snapshot & incremental backup | ✅ | ✅ | Traditional backup methods |
+| **Performance** |
+| Zero-copy streaming performance | ✅ | ✅ | Both versions benefit from zero-copy streaming |
+| SAI write performance | ✅ | ✅ | 43x better than secondary indexes |
+| SAI latency improvements | ✅ | ✅ | 230x better latency than secondary indexes |
+
+### Key Functional Differences
+
+**DSE 6.9 New Features:**
+- **Vector Search**: Powered by JVector engine, 10x faster than Lucene-based search. Enables AI/ML workloads with vector embeddings and similarity search.
+- **SAI Text Analyzers**: Enhanced SAI functionality with text analyzers for semantic filtering, term matching, tokenization, and keyword filtering.
+- **SAI OR Operator**: Expanded query capabilities with OR logic support in SAI queries.
+- **Vector Indexing**: Native support for VECTOR data type indexing and querying.
+
+**Shared Features (Both Versions):**
+- Zero-copy streaming for improved performance
+- NodeSync continuous background repair
+- Core SAI functionality (without text analyzers and OR operator in 6.8)
+- All DSE workloads (Search, Analytics, Graph)
+- Security and operations features
 
 ### Compatibility
 
 - DSE 6.9 is backward compatible with DSE 6.8
 - Upgrade path: DSE 6.8 → DSE 6.9 (one node at a time)
 - During partial upgrade, certain operations are restricted (see upgrade docs)
+- Vector search requires Vector Add-on in DSE 6.9
 
 ### When to Use DSE 6.8 vs 6.9
 
-- **DSE 6.8**: Stable, production-proven version
-- **DSE 6.9**: Latest version with performance improvements, recommended for new deployments
+- **DSE 6.8**: Stable, production-proven version with all core DSE 6 features. Suitable for traditional database workloads.
+- **DSE 6.9**: Latest version with vector search capabilities and enhanced SAI features. Recommended for:
+  - AI/ML workloads requiring vector similarity search
+  - Applications needing advanced text analysis and semantic filtering
+  - New deployments requiring latest features and improvements
 
 ## 🎓 Learning Objectives
 
 After completing these exercises, you should be able to:
 
 - ✅ Verify DSE version and features
-- ✅ Understand zero-copy streaming benefits (DSE 6.9)
+- ✅ Understand zero-copy streaming benefits (available in DSE 6.8 and 6.9)
 - ✅ Measure and compare performance improvements
 - ✅ Use DSE 6 specific utilities effectively
 - ✅ Plan upgrades from DSE 6.8 to 6.9
