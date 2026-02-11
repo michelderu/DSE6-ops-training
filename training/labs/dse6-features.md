@@ -188,55 +188,59 @@ Hands-on exercises to explore DSE 6.8 and 6.9 specific features and improvements
 
 **Key Learning**: Understand what features are available in DSE 6.8 vs 6.9 and plan upgrades accordingly. DSE 6.9 adds vector search capabilities and enhanced SAI features for AI/ML workloads.
 
-## 📚 DSE 6.8 vs 6.9 Functional Comparison
+## 📚 DSE 5.1 vs 6.8 vs 6.9 Functional Comparison
 
 ### Feature Comparison Table
 
-| Feature | DSE 6.8 | DSE 6.9 | Notes |
-|---------|---------|---------|-------|
+| Feature | DSE 5.1 | DSE 6.8 | DSE 6.9 | Notes |
+|---------|---------|---------|---------|-------|
 | **Core Database** |
-| Zero-copy streaming | ✅ | ✅ | Up to 4x faster streaming, repair, and node operations |
-| NodeSync | ✅ | ✅ | Continuous background repair |
-| Storage-Attached Indexing (SAI) | ✅ | ✅ | Secondary indexing with improved performance |
-| SAI text analyzers | ❌ | ✅ | Enable semantic filtering and term matching on strings |
-| SAI OR operator | ❌ | ✅ | OR logic support in SAI queries (in addition to AND) |
-| SAI vector indexing | ❌ | ✅ | Index and query VECTOR data type |
+| Zero-copy streaming | ❌ | ✅ | ✅ | Up to 4x faster streaming, repair, and node operations (introduced in 6.8) |
+| NodeSync | ❌ | ✅ | ✅ | Continuous background repair (introduced in 6.8) |
+| Storage-Attached Indexing (SAI) | ❌ | ✅ | ✅ | Secondary indexing with improved performance (introduced in 6.8) |
+| SAI text analyzers | ❌ | ❌ | ✅ | Enable semantic filtering and term matching on strings |
+| SAI OR operator | ❌ | ❌ | ✅ | OR logic support in SAI queries (in addition to AND) |
+| SAI vector indexing | ❌ | ❌ | ✅ | Index and query VECTOR data type |
 | **Vector Search** |
-| Vector search (JVector) | ❌ | ✅ | 10x faster than Lucene-based search; requires Vector Add-on |
-| Vector embeddings (VECTOR type) | ❌ | ✅ | Fixed-dimensionality vector storage |
-| Vector similarity search | ❌ | ✅ | RAG and AI agent use cases |
+| Vector search (JVector) | ❌ | ❌ | ✅ | 10x faster than Lucene-based search; requires Vector Add-on |
+| Vector embeddings (VECTOR type) | ❌ | ❌ | ✅ | Fixed-dimensionality vector storage |
+| Vector similarity search | ❌ | ❌ | ✅ | RAG and AI agent use cases |
 | **Search & Indexing** |
-| DSE Search (Solr) | ✅ | ✅ | Full-text search capabilities |
-| Secondary indexes (2i) | ✅ | ✅ | Traditional secondary indexing |
+| DSE Search (Solr) | ✅ | ✅ | ✅ | Full-text search capabilities |
+| Secondary indexes (2i) | ✅ | ✅ | ✅ | Traditional secondary indexing |
 | **Analytics** |
-| DSE Analytics (Spark) | ✅ | ✅ | Batch and streaming analytics |
-| AlwaysOn SQL | ✅ | ✅ | SQL interface for Spark |
+| DSE Analytics (Spark) | ✅ | ✅ | ✅ | Batch and streaming analytics |
+| AlwaysOn SQL | ✅ | ✅ | ✅ | SQL interface for Spark |
 | **Graph** |
-| DSE Graph | ✅ | ✅ | Graph database with Gremlin |
+| DSE Graph | ✅ | ✅ | ✅ | Graph database with Gremlin |
 | **Security** |
-| DSE Advanced Security | ✅ | ✅ | RBAC, LDAP, Kerberos, encryption |
+| DSE Advanced Security | ✅ | ✅ | ✅ | RBAC, LDAP, Kerberos, encryption |
 | **Operations** |
-| Backup & Restore Service | ✅ | ✅ | CQL-based automated backup |
-| Snapshot & incremental backup | ✅ | ✅ | Traditional backup methods |
+| Backup & Restore Service | ❌ | ✅ | ✅ | CQL-based automated backup (introduced in 6.8) |
+| Snapshot & incremental backup | ✅ | ✅ | ✅ | Traditional backup methods |
 | **Performance** |
-| Zero-copy streaming performance | ✅ | ✅ | Both versions benefit from zero-copy streaming |
-| SAI write performance | ✅ | ✅ | 43x better than secondary indexes |
-| SAI latency improvements | ✅ | ✅ | 230x better latency than secondary indexes |
+| Zero-copy streaming performance | ❌ | ✅ | ✅ | Up to 4x faster streaming, repair, and node operations |
+| SAI write performance | ❌ | ✅ | ✅ | 43x better than secondary indexes |
+| SAI latency improvements | ❌ | ✅ | ✅ | 230x better latency than secondary indexes |
 
 ### Key Functional Differences
 
-**DSE 6.9 New Features:**
+**DSE 6.8 Major Additions (vs DSE 5.1):**
+- **Zero-Copy Streaming**: Up to 4x faster streaming, repair, and node operations compared to DSE 5.1
+- **NodeSync**: Continuous background repair that eliminates manual repair scheduling
+- **Storage-Attached Indexing (SAI)**: High-performance secondary indexing with 43x better write throughput and 230x better latency than traditional secondary indexes
+- **Backup & Restore Service**: CQL-based automated backup and restore operations
+
+**DSE 6.9 New Features (vs DSE 6.8):**
 - **Vector Search**: Powered by JVector engine, 10x faster than Lucene-based search. Enables AI/ML workloads with vector embeddings and similarity search.
 - **SAI Text Analyzers**: Enhanced SAI functionality with text analyzers for semantic filtering, term matching, tokenization, and keyword filtering.
 - **SAI OR Operator**: Expanded query capabilities with OR logic support in SAI queries.
 - **Vector Indexing**: Native support for VECTOR data type indexing and querying.
 
-**Shared Features (Both Versions):**
-- Zero-copy streaming for improved performance
-- NodeSync continuous background repair
-- Core SAI functionality (without text analyzers and OR operator in 6.8)
-- All DSE workloads (Search, Analytics, Graph)
-- Security and operations features
+**Shared Features (All Versions):**
+- DSE workloads (Search, Analytics, Graph)
+- DSE Advanced Security (RBAC, LDAP, Kerberos, encryption)
+- Traditional backup methods (snapshots, incremental backup)
 
 ### Compatibility
 
