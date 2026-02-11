@@ -6,7 +6,7 @@
 services:
   dse-seed:
     image: "${DSE_IMAGE:-datastax/dse-server:6.8.62-ubi7}"
-    platform: linux/amd64
+    platform: linux/amd64  # DSE images are x86_64; on Apple Silicon use Colima with --vz-rosetta for Rosetta translation
     container_name: dse-seed
     hostname: dse-seed
     environment:
@@ -43,7 +43,7 @@ services:
 
   dse-node-1:
     image: "${DSE_IMAGE:-datastax/dse-server:6.8.62-ubi7}"
-    platform: linux/amd64
+    platform: linux/amd64  # DSE images are x86_64; on Apple Silicon use Colima with --vz-rosetta for Rosetta translation
     container_name: dse-node-1
     hostname: dse-node-1
     environment:
@@ -80,7 +80,7 @@ services:
 
   dse-node-2:
     image: "${DSE_IMAGE:-datastax/dse-server:6.8.62-ubi7}"
-    platform: linux/amd64
+    platform: linux/amd64  # DSE images are x86_64; on Apple Silicon use Colima with --vz-rosetta for Rosetta translation
     container_name: dse-node-2
     hostname: dse-node-2
     environment:

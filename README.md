@@ -12,7 +12,9 @@ A **comprehensive DataStax Enterprise 6.8 and 6.9 training** for operations team
 
 - 🐳 **Docker** or **Colima**:
   - **Docker**: Docker Engine + Docker Compose (`docker-compose` or plugin `docker compose`)
-  - **Colima**: Colima (provides Docker-compatible daemon; install with `brew install colima`). On **Apple Silicon (arm64)** start Colima with an x86_64 VM so the DSE image (linux/amd64) runs natively: `colima start --cpu 6 --memory 12 --disk 60 --arch aarch64 --vm-type vz`. On Intel Macs: `colima start --cpu 4 --memory 8 --disk 20 `.
+  - **Colima**: Colima (provides Docker-compatible daemon; install with `brew install colima`).
+    - **Apple Silicon (arm64)**: DSE images are `linux/amd64` (x86_64). Start Colima with Rosetta translation: `colima start --arch aarch64 --vm-type=vz --vz-rosetta --cpu 6 --memory 12 --disk 60`. This runs an arm64 VM that uses Rosetta to translate x86_64 containers (faster than full x86_64 emulation).
+    - **Intel Macs**: `colima start --cpu 6 --memory 12 --disk 60`
 - 💻 **4 GB+ RAM** for the host (8 GB recommended for 3-node cluster)
 - 💿 A few GB free disk for images and data
 
@@ -24,7 +26,7 @@ cd DSE-ops-training
 
 # 2. (Optional) Copy and edit .env for runtime, image tags, or heap size
 cp .env.example .env
-# Use Colima: set CONTAINER_RUNTIME=colima in .env. On Apple Silicon: colima start --arch x86_64
+# Use Colima: set CONTAINER_RUNTIME=colima in .env.
 
 # 3. Start the cluster (seed first, then 2 nodes)
 ./scripts/up-cluster.sh

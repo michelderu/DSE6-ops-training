@@ -19,6 +19,7 @@ By the end of this training you will be able to:
 **Note**: No prior Cassandra or DSE experience is required; concepts are introduced as needed.
 
 - 🐳 **Docker** (Engine + Compose: `docker-compose` or `docker compose`) or **Colima** (provides Docker; run `colima start`, then scripts use compose). Set `CONTAINER_RUNTIME=docker` or `CONTAINER_RUNTIME=colima` in `.env` so the scripts use the right commands.
+  - **Apple Silicon**: DSE images are `linux/amd64` (x86_64). Use Colima with Rosetta: `colima start --arch aarch64 --vm-type=vz --vz-rosetta --cpu 8 --memory 16` (see [03 – Environment](03-environment.md) for details).
 - 💻 **4 GB+ RAM** for the host (8 GB recommended for 3-node cluster)
 - 💿 **Disk**: a few GB free for images and data
 - ⌨️ Basic familiarity with the command line and YAML

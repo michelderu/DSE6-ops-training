@@ -22,12 +22,19 @@ docker-compose --version
 
 ```bash
 colima --version
-# On Apple Silicon (arm64): use x86_64 VM so DSE image (linux/amd64) runs natively (no platform warning)
-colima start --arch aarch64 --vm-type=vz --vz-rosetta --cpu 8 --memory 16 # Apple Silicon (if Colima already runs arm64: colima stop, then this)
-# colima start --cpu 8 --memory 16 # Run this on an Intel Mac
+
+# Apple Silicon (arm64): DSE images are linux/amd64 (x86_64 architecture)
+# Use Rosetta translation for better performance (arm64 VM translates x86_64 containers)
+colima start --arch aarch64 --vm-type=vz --vz-rosetta --cpu 6 --memory 12
+
+# Intel Macs: standard Colima startup
+# colima start --cpu 6 --memory 12
+
 docker-compose --version
 # Or: docker compose version
 ```
+
+💡 **Note**: The `platform: linux/amd64` in `docker-compose.yml` forces x86_64 containers. On Apple Silicon, Colima with `--vz-rosetta` translates these efficiently using Rosetta 2.
 
 ⚙️ **Configuration**: Set `CONTAINER_RUNTIME=docker` or `CONTAINER_RUNTIME=colima` in `.env` so the scripts use the correct commands.
 
