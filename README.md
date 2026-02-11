@@ -36,6 +36,68 @@ This training covers both DSE 6.8 and 6.9. While both versions share core featur
 
 For a detailed feature comparison, see the **[DSE 6.8 vs 6.9 Functional Comparison](training/labs/dse6-features.md#dse-68-vs-69-functional-comparison)** table in the [DSE 6 Features Lab](training/labs/dse6-features.md).
 
+## Managing DSE Operations: Self-Managed vs Mission Control
+
+### This Training: Self-Managed Operations
+
+This training teaches you how to **manage DSE operations yourself** using command-line tools (`nodetool`, `dsetool`, `cqlsh`) and understanding the underlying concepts. You'll learn:
+
+- **Cluster lifecycle**: Starting, stopping, scaling nodes manually
+- **Monitoring**: Using `nodetool` commands, JMX metrics, and log analysis
+- **Maintenance**: Running repairs, cleanup, snapshots, and backups manually
+- **Troubleshooting**: Diagnosing issues using logs, gossip info, and cluster status
+- **Configuration**: Managing DSE configuration files and encryption
+
+**When to use self-managed operations:**
+- ✅ You need full control and visibility into every operation
+- ✅ You want to understand how DSE works under the hood
+- ✅ You have specific operational requirements or custom automation needs
+- ✅ You're building internal tooling or integrating with existing systems
+- ✅ You're learning DSE operations (this training!)
+
+### DataStax Mission Control: Automated Operations Platform
+
+**Mission Control** is DataStax's Kubernetes-based operations platform that **automates and simplifies** DSE cluster management. It provides:
+
+- **Automated Lifecycle Management**: Provisioning, deployment, rolling restarts, upgrades
+- **Advanced Operations**: Automated cleanup, rebuild, backup, and restore operations
+- **Centralized Monitoring**: Unified observability across multiple clusters and datacenters
+- **24/7 Automated Operations**: Same automation used for Astra DB
+- **Multi-Cluster Management**: Orchestrate operations across regional cluster boundaries
+- **Security**: Built-in authentication, authorization, and TLS encryption
+
+**Deployment Options:**
+- **Kubernetes**: Deploy on existing Kubernetes clusters (EKS, GKE, AKS, OpenShift, or any Kubernetes distribution)
+- **VM/Bare Metal**: Deploy on virtual machines or bare-metal servers using an embedded Kubernetes cluster (simpler setup, less flexible scaling)
+
+**When to use Mission Control:**
+- ✅ You want to reduce operational overhead and manual tasks
+- ✅ You manage multiple clusters or datacenters
+- ✅ You need centralized monitoring and management
+- ✅ You want automated operations with minimal manual intervention
+- ✅ You prefer a UI-based approach for cluster management
+
+### Comparison: Self-Managed vs Mission Control
+
+| Aspect | Self-Managed (This Training) | Mission Control |
+|--------|------------------------------|-----------------|
+| **Control** | Full control over every operation | Automated operations with oversight |
+| **Learning** | Deep understanding of DSE internals | Focus on high-level operations |
+| **Complexity** | Manual execution of operations | Automated workflows |
+| **Monitoring** | Command-line tools (`nodetool`, JMX) | Unified dashboard and metrics |
+| **Multi-Cluster** | Manual coordination across clusters | Centralized multi-cluster management |
+| **Setup Time** | Immediate (this training) | Requires Mission Control installation |
+| **Customization** | Full flexibility for custom needs | Standardized automated workflows |
+| **Troubleshooting** | Direct access to logs and tools | Integrated diagnostic tools |
+
+**Best Practice**: Even if you plan to use Mission Control, understanding the underlying operations (as taught in this training) helps you:
+- Make informed decisions about Mission Control configurations
+- Troubleshoot issues when automation doesn't cover edge cases
+- Understand what Mission Control is doing behind the scenes
+- Build custom automation that complements Mission Control
+
+For more information about Mission Control, see the [Mission Control Documentation](https://docs.datastax.com/en/mission-control/).
+
 ## What’s Included
 
 - 🐳 **Docker or Colima** Compose stack: 3-node DSE 6.8/6.9 cluster
@@ -136,3 +198,4 @@ docker-compose down
 - 📖 [DSE 6.9 Documentation](https://docs.datastax.com/en/dse/6.9/)
 - 🐳 [DataStax Docker Guide](https://docs.datastax.com/en/docker/)
 - 🔄 [Upgrading DSE 6.8 to 6.9](https://docs.datastax.com/en/upgrading/datastax-enterprise/dse-68-to-69.html)
+- 🎛️ [Mission Control Documentation](https://docs.datastax.com/en/mission-control/)
